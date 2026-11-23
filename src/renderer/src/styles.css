@@ -1506,3 +1506,76 @@ a {
     white-space: nowrap;
   }
 }
+
+/* Resumen de métricas de la conversación */
+.session-metrics {
+  margin-bottom: 10px;
+}
+
+.session-metrics-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 14px;
+  width: 100%;
+  padding: 7px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-soft);
+  color: var(--muted);
+  font-size: 11.5px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.session-metrics-bar:hover {
+  border-color: var(--text-dim);
+  color: var(--text-dim);
+}
+
+.session-metrics-bar .metric strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.session-metrics-toggle {
+  margin-left: auto;
+  color: var(--accent);
+}
+
+.session-metrics-panel {
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  background: var(--bg-soft);
+  padding: 12px;
+}
+
+.session-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px 16px;
+}
+
+.session-metrics-grid .k {
+  display: block;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.session-metrics-grid .v {
+  display: block;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.session-metrics-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border);
+}

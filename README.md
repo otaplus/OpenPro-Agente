@@ -9,6 +9,7 @@ Agente de programación **100 % local** para tu escritorio. Descarga modelos GGU
 - Agente con herramientas: leer, escribir y editar archivos, buscar, listar, ejecutar comandos y consultar documentación web.
 - Aprobación de comandos, permisos por nivel y sesiones persistentes.
 - Métricas por respuesta: tokens, tokens/s, latencia del primer token y tiempo total, para comparar modelos.
+- Resumen por conversación (totales y medias) y exportación a CSV de todas las métricas.
 - UI en español, temas oscuro y claro.
 
 > Estado: **beta**. La app funciona en Windows y el código incluye configuración para macOS y Linux; los instaladores de macOS/Linux aún no se han probado a fondo.
@@ -81,6 +82,17 @@ Debajo de cada respuesta aparece un pie con los números reales que reporta llam
 
 Pasa el ratón por encima para ver el desglose completo (modelo, backend, tokens en caché y pasos del agente).
 Es la forma más rápida de comparar dos modelos con la misma petición: mismos tokens de prompt, distinta velocidad y calidad.
+
+### Resumen de la conversación y exportación
+
+En la parte superior del chat hay una barra con los totales de la conversación: número de respuestas, tokens generados, velocidad media y tiempo acumulado. Al desplegarla («Detalles») se ven también los tokens de prompt, la media del primer token, el modelo y el backend usados.
+
+Desde ese panel puedes exportar las métricas a **CSV**:
+
+- **esta conversación**: una fila por respuesta;
+- **todas**: todas las conversaciones, con su título.
+
+Columnas: fecha, conversación, modelo, backend, tokens de prompt (y cuántos en caché), ms y tok/s del prompt, tokens generados, ms y tok/s de generación, ms del primer token, ms totales y pasos del agente. Se guarda en UTF-8 con BOM y separador `;` para abrirlo directamente en Excel en español.
 
 ### Permisos del agente
 

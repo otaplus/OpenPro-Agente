@@ -493,6 +493,7 @@ export default function App() {
               step={step}
               engine={engine}
               disabled={!canChat}
+              onToast={toast}
               onSend={(text) => void handleSend(text)}
               onStop={stop}
               onApprove={(id, decision) => void approve(id, decision)}

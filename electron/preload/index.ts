@@ -36,6 +36,9 @@ const api: OpenProApi = {
     delete: (path) => invoke('models:delete', path),
     importFile: () => invoke('models:import')
   },
+  metrics: {
+    exportCsv: (sessionId) => invoke('metrics:exportCsv', sessionId)
+  },
   engine: {
     status: () => invoke('engine:status'),
     install: () => invoke('engine:install'),

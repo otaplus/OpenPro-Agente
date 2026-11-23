@@ -368,6 +368,13 @@ export interface OpenProApi {
     delete(path: string): Promise<void>
     importFile(): Promise<DownloadJob | null>
   }
+  metrics: {
+    /**
+     * Exporta las métricas a CSV. Con `sessionId` exporta solo esa conversación;
+     * sin él, todas. Devuelve la ruta escrita o null si se cancela el diálogo.
+     */
+    exportCsv(sessionId?: string): Promise<string | null>
+  }
   engine: {
     status(): Promise<EngineStatus>
     install(): Promise<EngineStatus>

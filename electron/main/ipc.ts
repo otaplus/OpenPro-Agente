@@ -23,6 +23,7 @@ import {
   stopEngine
 } from './engine'
 import { abortChat, resolveApproval, sendChat } from './agent'
+import { exportMetricsCsv } from './metrics'
 import { createSession, deleteSession, listSessions, loadSession, saveSession } from './sessions'
 import { ensureDir } from './util'
 import { log, logPathForUser } from './logger'
@@ -149,6 +150,8 @@ export function registerIpc(): void {
   })
 
   ipcMain.handle('app:settingsFile', () => settingsFile())
+
+  ipcMain.handle('metrics:exportCsv', (_e, sessionId?: string) => exportMetricsCsv(sessionId))
 
   ipcMain.handle('clipboard:write', (_e, text: string) => {
     clipboard.writeText(String(text ?? ''))

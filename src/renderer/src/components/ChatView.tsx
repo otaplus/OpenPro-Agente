@@ -4,6 +4,7 @@ import { MessageView } from './MessageView'
 import { Markdown } from './Markdown'
 import { ToolCard, type ToolStatus } from './ToolCard'
 import { Composer } from './Composer'
+import { SessionMetrics } from './SessionMetrics'
 
 const SUGGESTIONS = [
   'Explora el proyecto y explícame su arquitectura.',
@@ -21,6 +22,7 @@ export function ChatView({
   step,
   engine,
   disabled,
+  onToast,
   onSend,
   onStop,
   onApprove,
@@ -34,6 +36,7 @@ export function ChatView({
   step: { step: number; max: number } | null
   engine: EngineStatus | null
   disabled: boolean
+  onToast: (message: string, error?: boolean) => void
   onSend: (text: string) => void
   onStop: () => void
   onApprove: (requestId: string, decision: 'once' | 'always' | 'deny') => void
@@ -87,6 +90,7 @@ export function ChatView({
         }}
       >
         <div className="messages-inner">
+          <SessionMetrics session={session} onExported={(path, error) => onToast(error ?? (path ? `Métricas exportadas: ${path}` : 'Exportación cancelada'), Boolean(error))} />
           {engine?.state === 'error' && (
             <div className="msg-error">Motor: {engine.message ?? 'error desconocido'}</div>
           )}
