@@ -429,12 +429,12 @@ export default function App() {
     engine?.state === 'ready' ? 'ready' : engine?.state === 'starting' ? 'starting' : engine?.state === 'error' ? 'error' : ''
   const chipText =
     engine?.state === 'ready'
-      ? `Motor listo${engine.backend ? ` · ${engine.backend.toUpperCase()}` : ''}`
+      ? `${t('Motor listo')}${engine.backend ? ` · ${engine.backend.toUpperCase()}` : ''}`
       : engine?.state === 'starting'
-        ? 'Cargando modelo…'
+        ? t('Cargando modelo…')
         : engine?.state === 'error'
           ? 'Error del motor'
-          : 'Motor detenido'
+          : t('Motor detenido')
 
   return (
     <div className="app">

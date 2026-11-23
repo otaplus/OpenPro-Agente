@@ -309,6 +309,7 @@ const EN: Record<string, string> = {
   'Conversaciones': 'Conversations',
   'Tú': 'You',
   'TÚ': 'YOU',
+  'Motor listo': 'Engine ready',
 }
 
 let current: Lang = 'es'
