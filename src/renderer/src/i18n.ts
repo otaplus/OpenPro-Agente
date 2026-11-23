@@ -306,6 +306,9 @@ const EN: Record<string, string> = {
   'Generación': 'Generation',
   'Pasos del agente': 'Agent steps',
   'Aquí se descargan los GGUF. Puedes usar un disco externo; asegúrate de que tenga espacio suficiente.': 'GGUF files are downloaded here. You can use an external drive; make sure it has enough free space.',
+  'Conversaciones': 'Conversations',
+  'Tú': 'You',
+  'TÚ': 'YOU',
 }
 
 let current: Lang = 'es'

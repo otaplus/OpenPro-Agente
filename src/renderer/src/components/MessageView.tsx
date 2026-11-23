@@ -71,10 +71,10 @@ export function MessageView({
   if (message.role === 'user') {
     return (
       <div className="msg msg-user">
-        <div className="avatar user">TÚ</div>
+        <div className="avatar user">{t('TÚ')}</div>
         <div className="msg-body">
           <div className="msg-head">
-            <span className="name">Tú</span>
+            <span className="name">{t('Tú')}</span>
             <span className="spacer" />
             <CopyButton text={message.content} />
           </div>

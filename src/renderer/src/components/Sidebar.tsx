@@ -79,7 +79,7 @@ export function Sidebar({
       </nav>
 
       <div className="sidebar-section">
-        <span>Conversaciones</span>
+        <span>{t('Conversaciones')}</span>
         <button className="btn btn-sm btn-ghost" title={t('Nueva conversación')} onClick={onNewChat}>
           <Icon name="plus" />
         </button>
