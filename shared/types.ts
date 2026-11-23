@@ -232,6 +232,8 @@ export interface AppSettings {
   modelsDir: string
   onboardingDone: boolean
   theme: 'dark' | 'light'
+  /** Idioma de la interfaz: español o inglés. */
+  language: 'es' | 'en'
   hfToken: string
   engine: {
     mode: 'managed' | 'external'

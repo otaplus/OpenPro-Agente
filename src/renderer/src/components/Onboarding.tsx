@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { t } from '../i18n'
 import type {
   AppSettings,
   DownloadJob,
@@ -58,12 +59,12 @@ export function Onboarding({
   const pct = totalBytes > 0 ? Math.min(100, (receivedBytes / totalBytes) * 100) : downloadDone ? 100 : 0
 
   async function pickModelsDir(): Promise<void> {
-    const dir = await api.dialog.pickFolder('Carpeta para guardar los modelos', modelsDir)
+    const dir = await api.dialog.pickFolder(t('Carpeta para guardar los modelos'), modelsDir)
     if (dir) setModelsDir(dir)
   }
 
   async function pickWorkspace(): Promise<void> {
-    const dir = await api.dialog.pickFolder('Carpeta del proyecto donde trabajará el agente', workspace ?? undefined)
+    const dir = await api.dialog.pickFolder(t('Carpeta del proyecto donde trabajará el agente'), workspace ?? undefined)
     if (dir) setWorkspace(dir)
   }
 
@@ -115,17 +116,16 @@ export function Onboarding({
 
         {step === 0 && (
           <>
-            <h2>Bienvenido a OpenPro Agente</h2>
+            <h2>{t('Bienvenido a OpenPro Agente')}</h2>
             <div className="modal-sub">
-              Un agente de programación que corre íntegramente en tu equipo: modelos GGUF de HuggingFace, motor
-              llama.cpp y tus archivos. Sin cuentas ni nube.
+              {t('Un agente de programación que corre íntegramente en tu equipo: modelos GGUF de HuggingFace, motor llama.cpp y tus archivos. Sin cuentas ni nube.')}
             </div>
-            {!hardware && <div className="hint-box">Analizando tu equipo… (CPU, RAM, GPU y espacio libre)</div>}
+            {!hardware && <div className="hint-box">{t('Analizando tu equipo… (CPU, RAM, GPU y espacio libre)')}</div>}
             {hardware && (
               <>
                 <div className="hw-grid">
                   <div className="hw-item">
-                    <div className="k">Sistema</div>
+                    <div className="k">{t('Sistema')}</div>
                     <div className="v">{hardware.osLabel}</div>
                   </div>
                   <div className="hw-item">
@@ -141,11 +141,11 @@ export function Onboarding({
                     <div className="v" title={hardware.gpus.map((g) => g.name).join(', ')}>
                       {hardware.gpus.length
                         ? `${hardware.gpus[0].name}${hardware.totalVramGB ? ` · ${hardware.totalVramGB} GB` : ''}`
-                        : 'Sin GPU dedicada'}
+                        : t('Sin GPU dedicada')}
                     </div>
                   </div>
                   <div className="hw-item">
-                    <div className="k">Aceleración</div>
+                    <div className="k">{t('Aceleración')}</div>
                     <div className="v">{hardware.backend.toUpperCase()}</div>
                   </div>
                   <div className="hw-item">
@@ -164,10 +164,10 @@ export function Onboarding({
             )}
             <div className="modal-actions">
               <button className="btn btn-ghost" onClick={() => void finish(true)}>
-                Configurar más tarde
+                {t('Configurar más tarde')}
               </button>
               <button className="btn btn-primary" onClick={() => setStep(1)}>
-                Continuar
+                {t('Continuar')}
               </button>
             </div>
           </>
@@ -175,13 +175,13 @@ export function Onboarding({
 
         {step === 1 && (
           <>
-            <h2>¿Dónde guardamos las cosas?</h2>
+            <h2>{t('¿Dónde guardamos las cosas?')}</h2>
             <div className="modal-sub">
               Los modelos ocupan varios GB. Elige una carpeta con espacio; puedes cambiarla después.
             </div>
 
             <div className="field">
-              <label>Carpeta de modelos</label>
+              <label>{t('Carpeta de modelos')}</label>
               <div className="row">
                 <input className="input mono grow" value={modelsDir} readOnly />
                 <button className="btn" onClick={() => void pickModelsDir()}>
@@ -190,25 +190,25 @@ export function Onboarding({
               </div>
               <span className="hint">
                 {hardware && hardware.freeDiskGB >= 0
-                  ? `Quedan ~${hardware.freeDiskGB} GB libres en ese disco (según la carpeta actual).`
-                  : 'Se creará automáticamente si no existe.'}
+                  ? t('Quedan ~{gb} GB libres en ese disco (según la carpeta actual).', { gb: hardware.freeDiskGB })
+                  : t('Se creará automáticamente si no existe.')}
               </span>
             </div>
 
             <div className="field">
-              <label>Carpeta del proyecto (opcional)</label>
+              <label>{t('Carpeta del proyecto (opcional)')}</label>
               <div className="row">
-                <input className="input mono grow" value={workspace ?? ''} readOnly placeholder="Elige el repo o carpeta donde quieres trabajar" />
+                <input className="input mono grow" value={workspace ?? ''} readOnly placeholder={t('Elige el repo o carpeta donde quieres trabajar')} />
                 <button className="btn" onClick={() => void pickWorkspace()}>
                   Elegir…
                 </button>
               </div>
-              <span className="hint">El agente nunca saldrá de esta carpeta. Puedes cambiarla en cualquier momento.</span>
+              <span className="hint">{t('El agente nunca saldrá de esta carpeta. Puedes cambiarla en cualquier momento.')}</span>
             </div>
 
             <div className="modal-actions">
               <button className="btn btn-ghost" onClick={() => setStep(0)}>
-                Atrás
+                {t('Atrás')}
               </button>
               <button
                 className="btn btn-primary"
@@ -217,7 +217,7 @@ export function Onboarding({
                   setStep(2)
                 }}
               >
-                Continuar
+                {t('Continuar')}
               </button>
             </div>
           </>
@@ -225,14 +225,14 @@ export function Onboarding({
 
         {step === 2 && (
           <>
-            <h2>Elige tu modelo</h2>
+            <h2>{t('Elige tu modelo')}</h2>
             <div className="modal-sub">
-              Recomendaciones según tu hardware. El motor llama.cpp se instala solo la primera vez.
+              {t('Recomendaciones según tu hardware. El motor llama.cpp se instala solo la primera vez.')}
             </div>
 
             {!options.length && (
               <div className="hint-box">
-                No se pudo calcular una recomendación. Puedes instalar un modelo manualmente desde la pestaña Modelos.
+                {t('No se pudo calcular una recomendación. Puedes instalar un modelo manualmente desde la pestaña Modelos.')}
               </div>
             )}
 
@@ -247,11 +247,11 @@ export function Onboarding({
                     <span className="reco-name">{rec.model.name}</span>
                     <span className={`badge ${rec.fit === 'gpu' || rec.fit === 'unified' ? 'ok' : rec.fit === 'hybrid' ? 'accent' : 'warn'}`}>
                       {rec.fit === 'gpu'
-                        ? 'GPU completa'
+                        ? t('GPU completa')
                         : rec.fit === 'unified'
-                          ? 'Memoria unificada'
+                          ? t('Memoria unificada')
                           : rec.fit === 'hybrid'
-                            ? 'GPU + CPU'
+                            ? t('GPU + CPU')
                             : 'CPU'}
                     </span>
                     <span className="badge">{rec.quant.quant} · {rec.quant.sizeGB.toFixed(1)} GB</span>
@@ -283,9 +283,9 @@ export function Onboarding({
                 disabled={!selected || preparing || installing?.running || downloadDone}
               >
                 {preparing || installing?.running
-                  ? 'Preparando…'
+                  ? t('Preparando…')
                   : downloadDone
-                    ? 'Descarga completada'
+                    ? t('Descarga completada')
                     : 'Instalar motor y descargar'}
               </button>
             </div>
@@ -301,7 +301,7 @@ export function Onboarding({
                     : downloadError
                       ? downloadError.error
                       : downloadDone
-                        ? 'Modelo descargado. ¡Listo para empezar!'
+                        ? t('Modelo descargado. ¡Listo para empezar!')
                         : jobs.length
                           ? `${formatBytes(receivedBytes)} de ${formatBytes(totalBytes)}`
                           : 'Resolviendo archivos en HuggingFace…'}
@@ -313,13 +313,13 @@ export function Onboarding({
 
             <div className="modal-actions">
               <button className="btn btn-ghost" onClick={() => setStep(1)}>
-                Atrás
+                {t('Atrás')}
               </button>
               <button className="btn" onClick={() => void finish(true)}>
-                Omitir descarga
+                {t('Omitir descarga')}
               </button>
               <button className="btn btn-primary" onClick={() => void finish(false)} disabled={!downloadDone}>
-                Empezar a usar
+                {t('Empezar a usar')}
               </button>
             </div>
           </>

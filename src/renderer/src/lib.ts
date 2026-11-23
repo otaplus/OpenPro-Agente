@@ -1,4 +1,11 @@
+import { getLang, t } from './i18n'
+
 export const api = window.api
+
+/** Locale para números y fechas según el idioma elegido. */
+function locale(): string {
+  return getLang() === 'en' ? 'en-US' : 'es-ES'
+}
 
 export function formatBytes(bytes: number): string {
   if (!Number.isFinite(bytes) || bytes <= 0) return '0 B'
@@ -11,13 +18,13 @@ export function formatBytes(bytes: number): string {
 export function timeAgo(ts: number): string {
   const diff = Date.now() - ts
   const min = Math.round(diff / 60000)
-  if (min < 1) return 'ahora'
-  if (min < 60) return `hace ${min} min`
+  if (min < 1) return t('ahora')
+  if (min < 60) return t('hace {n} min', { n: min })
   const h = Math.round(min / 60)
-  if (h < 24) return `hace ${h} h`
+  if (h < 24) return t('hace {n} h', { n: h })
   const d = Math.round(h / 24)
-  if (d < 30) return `hace ${d} d`
-  return new Date(ts).toLocaleDateString()
+  if (d < 30) return t('hace {n} d', { n: d })
+  return new Date(ts).toLocaleDateString(locale())
 }
 
 export function clamp(n: number, min: number, max: number): number {
@@ -30,16 +37,16 @@ export function shortPath(p: string | null | undefined): string {
   return parts.length <= 3 ? p : `…/${parts.slice(-2).join('/')}`
 }
 
-/** Números con separador de miles en español (1.234). */
+/** Números con separador de miles (1.234 en español, 1,234 en inglés). */
 export function formatInt(n: number | undefined): string {
   if (n === undefined || !Number.isFinite(n)) return '—'
-  return Math.round(n).toLocaleString('es-ES')
+  return Math.round(n).toLocaleString(locale())
 }
 
 /** Velocidad en tokens por segundo con un decimal (58,7 tok/s). */
 export function formatSpeed(n: number | undefined): string {
   if (n === undefined || !Number.isFinite(n)) return '—'
-  return `${n.toFixed(1).replace('.', ',')} tok/s`
+  return `${n.toLocaleString(locale(), { minimumFractionDigits: 1, maximumFractionDigits: 1 })} tok/s`
 }
 
 /** Duración legible: 640 ms, 4,2 s, 2 min 5 s. */
@@ -47,7 +54,9 @@ export function formatDuration(ms: number | undefined): string {
   if (ms === undefined || !Number.isFinite(ms)) return '—'
   if (ms < 1000) return `${Math.round(ms)} ms`
   const seconds = ms / 1000
-  if (seconds < 60) return `${seconds.toFixed(1).replace('.', ',')} s`
+  if (seconds < 60) {
+    return `${seconds.toLocaleString(locale(), { minimumFractionDigits: 1, maximumFractionDigits: 1 })} s`
+  }
   const min = Math.floor(seconds / 60)
   const rest = Math.round(seconds % 60)
   return `${min} min ${rest} s`

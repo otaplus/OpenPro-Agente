@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { t } from '../i18n'
 
 export function Composer({
   busy,
@@ -50,8 +51,8 @@ export function Composer({
             value={value}
             placeholder={
               disabled
-                ? 'Selecciona un modelo y una carpeta de proyecto para empezar…'
-                : 'Pide un cambio, una explicación o una tarea. Shift+Enter para nueva línea.'
+                ? t('Selecciona un modelo y una carpeta de proyecto para empezar…')
+                : t('Pide un cambio, una explicación o una tarea. Shift+Enter para nueva línea.')
             }
             disabled={disabled}
             onChange={(e) => setValue(e.target.value)}
@@ -65,26 +66,26 @@ export function Composer({
           <div className="composer-actions">
             {busy && step && (
               <span className="muted small">
-                Paso {step.step} de {step.max}
+                {t('Paso {n} de {max}', { n: step.step, max: step.max })}
               </span>
             )}
             <span className="spacer" />
-            <button className="btn btn-ghost" onClick={paste} disabled={disabled} title="Pegar del portapapeles">
-              Pegar
+            <button className="btn btn-ghost" onClick={paste} disabled={disabled} title={t('Pegar del portapapeles')}>
+              {t('Pegar')}
             </button>
             {busy ? (
               <button className="btn btn-danger" onClick={onStop}>
-                Detener
+                {t('Detener')}
               </button>
             ) : (
               <button className="btn btn-primary" onClick={send} disabled={!value.trim() || disabled}>
-                Enviar ↵
+                {t('Enviar')} ↵
               </button>
             )}
           </div>
         </div>
         <div className="composer-hint">
-          El modelo y las herramientas se ejecutan en tu equipo. Nada se envía a la nube.
+          {t('El modelo y las herramientas se ejecutan en tu equipo. Nada se envía a la nube.')}
         </div>
       </div>
     </div>

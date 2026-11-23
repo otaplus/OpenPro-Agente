@@ -1,4 +1,5 @@
 import type { ToolCall } from '@shared/types'
+import { t } from '../i18n'
 import { copyText } from '../lib'
 
 export type ToolStatus = 'pending' | 'running' | 'done' | 'error' | 'denied'
@@ -27,11 +28,11 @@ function targetOf(call: ToolCall): string {
 }
 
 const STATUS_LABEL: Record<ToolStatus, string> = {
-  pending: 'en cola',
-  running: 'ejecutando',
+  pending: t('en cola'),
+  running: t('ejecutando'),
   done: 'ok',
-  error: 'error',
-  denied: 'denegado'
+  error: t('error'),
+  denied: t('denegado')
 }
 
 export function ToolCard({
@@ -78,7 +79,7 @@ export function ToolCard({
             </div>
           </>
         ) : (
-          <div className="muted small">{status === 'running' ? 'Ejecutando…' : 'Sin salida todavía.'}</div>
+          <div className="muted small">{status === 'running' ? t('Ejecutando…') : t('Sin salida todavía.')}</div>
         )}
       </div>
     </details>

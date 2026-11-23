@@ -1,5 +1,6 @@
 import type { AppInfo, EngineStatus, SessionSummary } from '@shared/types'
 import { timeAgo } from '../lib'
+import { t } from '../i18n'
 
 export type Page = 'chat' | 'models' | 'settings'
 
@@ -50,10 +51,10 @@ export function Sidebar({
     engine?.state === 'ready'
       ? `Motor listo${engine.backend ? ` · ${engine.backend.toUpperCase()}` : ''}`
       : engine?.state === 'starting'
-        ? 'Cargando modelo…'
+        ? t('Cargando modelo…')
         : engine?.state === 'error'
-          ? 'Error del motor'
-          : 'Motor detenido'
+          ? t('Error del motor')
+          : t('Motor detenido')
 
   return (
     <aside className="sidebar">
@@ -67,25 +68,25 @@ export function Sidebar({
 
       <nav className="sidebar-nav">
         <button className={`nav-btn ${page === 'chat' ? 'active' : ''}`} onClick={() => onPage('chat')}>
-          <Icon name="chat" /> Chat
+          <Icon name="chat" /> {t('Chat')}
         </button>
         <button className={`nav-btn ${page === 'models' ? 'active' : ''}`} onClick={() => onPage('models')}>
-          <Icon name="cube" /> Modelos
+          <Icon name="cube" /> {t('Modelos')}
         </button>
         <button className={`nav-btn ${page === 'settings' ? 'active' : ''}`} onClick={() => onPage('settings')}>
-          <Icon name="gear" /> Ajustes
+          <Icon name="gear" /> {t('Ajustes')}
         </button>
       </nav>
 
       <div className="sidebar-section">
         <span>Conversaciones</span>
-        <button className="btn btn-sm btn-ghost" title="Nueva conversación" onClick={onNewChat}>
+        <button className="btn btn-sm btn-ghost" title={t('Nueva conversación')} onClick={onNewChat}>
           <Icon name="plus" />
         </button>
       </div>
 
       <div className="sessions">
-        {!sessions.length && <div className="muted small" style={{ padding: '8px 10px' }}>Sin conversaciones todavía.</div>}
+        {!sessions.length && <div className="muted small" style={{ padding: '8px 10px' }}>{t('Sin conversaciones todavía.')}</div>}
         {sessions.map((session) => (
           <div
             key={session.id}
@@ -97,7 +98,7 @@ export function Sidebar({
             <span className="when">{timeAgo(session.updatedAt)}</span>
             <button
               className="del"
-              title="Eliminar conversación"
+              title={t('Eliminar conversación')}
               onClick={(event) => {
                 event.stopPropagation()
                 onDeleteSession(session.id)
@@ -114,9 +115,9 @@ export function Sidebar({
           <span className="dot" /> {chipText}
         </div>
         <div className="row" style={{ justifyContent: 'space-between' }}>
-          <span className="muted small">{installedCount} modelo(s) local(es)</span>
+          <span className="muted small">{installedCount} {t('modelo(s) local(es)')}</span>
           <button className="btn btn-sm btn-ghost" onClick={() => onPage('models')}>
-            <Icon name="folder" /> Gestionar
+            <Icon name="folder" /> {t('Gestionar')}
           </button>
         </div>
       </div>

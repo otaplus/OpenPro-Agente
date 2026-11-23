@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { t } from '../i18n'
 import type { ApprovalRequest, ChatMessage, ChatToolEvent, EngineStatus, Session } from '@shared/types'
 import { MessageView } from './MessageView'
 import { Markdown } from './Markdown'
@@ -7,10 +8,10 @@ import { Composer } from './Composer'
 import { SessionMetrics } from './SessionMetrics'
 
 const SUGGESTIONS = [
-  'Explora el proyecto y explícame su arquitectura.',
-  'Busca posibles bugs y propone correcciones.',
-  'Añade tests para el módulo principal.',
-  'Revisa el último cambio y resume su impacto.'
+  t('Explora el proyecto y explícame su arquitectura.'),
+  t('Busca posibles bugs y propone correcciones.'),
+  t('Añade tests para el módulo principal.'),
+  t('Revisa el último cambio y resume su impacto.')
 ]
 
 export function ChatView({
@@ -90,21 +91,20 @@ export function ChatView({
         }}
       >
         <div className="messages-inner">
-          <SessionMetrics session={session} onExported={(path, error) => onToast(error ?? (path ? `Métricas exportadas: ${path}` : 'Exportación cancelada'), Boolean(error))} />
+          <SessionMetrics session={session} onExported={(path, error) => onToast(error ?? (path ? t('Métricas exportadas: {path}', { path }) : t('Exportación cancelada')), Boolean(error))} />
           {engine?.state === 'error' && (
             <div className="msg-error">Motor: {engine.message ?? 'error desconocido'}</div>
           )}
 
           {!messages.length && !busy && (
             <div className="empty">
-              <h2 style={{ margin: '0 0 6px', fontSize: 20, color: 'var(--text)' }}>Agente local listo para programar</h2>
+              <h2 style={{ margin: '0 0 6px', fontSize: 20, color: 'var(--text)' }}>{t('Agente local listo para programar')}</h2>
               <p style={{ maxWidth: 520, margin: '0 auto 20px' }}>
-                Abre una carpeta de proyecto, elige un modelo GGUF y pídeme cambios reales en el código. Puedo leer,
-                editar, buscar y ejecutar comandos.
+                {t('Abre una carpeta de proyecto, elige un modelo GGUF y pídeme cambios reales en el código. Puedo leer, editar, buscar y ejecutar comandos.')}
               </p>
               {!session?.workspace && (
                 <button className="btn btn-primary" onClick={onPickWorkspace} style={{ marginBottom: 20 }}>
-                  Elegir carpeta de proyecto
+                  {t('Elegir carpeta de proyecto')}
                 </button>
               )}
               <div className="grid-2" style={{ maxWidth: 640, margin: '0 auto' }}>
@@ -141,7 +141,7 @@ export function ChatView({
                     <div className="reasoning-body">{live.reasoning}</div>
                   </details>
                 )}
-                {live.content ? <Markdown text={live.content} /> : thinking ? <span className="muted">Pensando… {elapsed}s</span> : null}
+                {live.content ? <Markdown text={live.content} /> : thinking ? <span className="muted">{t('Pensando…')} {elapsed}s</span> : null}
                 {busy && <span className="cursor" />}
               </div>
             </div>

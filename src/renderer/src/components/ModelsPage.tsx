@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { t } from '../i18n'
 import type {
   AppSettings,
   CatalogModel,
@@ -14,11 +15,11 @@ import type {
 import { api, formatBytes } from '../lib'
 
 const FIT_LABEL: Record<ModelRecommendation['fit'], string> = {
-  gpu: 'GPU completa',
-  unified: 'Memoria unificada',
-  hybrid: 'GPU + CPU',
+  gpu: t('GPU completa'),
+  unified: t('Memoria unificada'),
+  hybrid: t('GPU + CPU'),
   cpu: 'CPU',
-  no: 'No cabe'
+  no: t('No cabe')
 }
 
 const FIT_CLASS: Record<ModelRecommendation['fit'], string> = {
@@ -97,7 +98,7 @@ export function ModelsPage({
     try {
       const found = await api.models.search(query)
       setResults(found)
-      if (!found.length) toast('Sin resultados en HuggingFace para esa búsqueda.')
+      if (!found.length) toast(t('Sin resultados en HuggingFace para esa búsqueda.'))
     } catch (err) {
       toast(err instanceof Error ? err.message : String(err), true)
     } finally {
@@ -160,7 +161,7 @@ export function ModelsPage({
     if (!window.confirm(`¿Eliminar ${model.name} (${formatBytes(model.sizeBytes)}) del disco?`)) return
     try {
       await api.models.delete(model.path)
-      toast('Modelo eliminado')
+      toast(t('Modelo eliminado'))
       onRefresh()
     } catch (err) {
       toast(err instanceof Error ? err.message : String(err), true)
@@ -171,9 +172,9 @@ export function ModelsPage({
     <div className="page">
       <div className="page-inner">
         <div className="page-header">
-          <h1>Modelos</h1>
+          <h1>{t('Modelos')}</h1>
           <p>
-            Descarga modelos GGUF desde HuggingFace y guárdalos en tu carpeta. Todo se ejecuta en local con llama.cpp.
+            {t('Descarga modelos GGUF desde HuggingFace y guárdalos en tu carpeta. Todo se ejecuta en local con llama.cpp.')}
           </p>
         </div>
 
@@ -181,14 +182,14 @@ export function ModelsPage({
           <div className="card" style={{ borderColor: 'rgba(91,157,255,0.4)' }}>
             <div className="row">
               <div className="grow">
-                <div className="card-title">Falta el motor llama.cpp</div>
+                <div className="card-title">{t('Falta el motor llama.cpp')}</div>
                 <div className="card-sub">
                   Se descargará el binario adecuado para {hardware?.osLabel ?? 'tu sistema'} y backend{' '}
                   {hardware?.backend?.toUpperCase() ?? 'automático'}. Ocupa entre 30 y 400 MB según la GPU.
                 </div>
               </div>
               <button className="btn btn-primary" onClick={() => void api.engine.install()} disabled={installing?.running}>
-                {installing?.running ? 'Instalando…' : 'Instalar motor'}
+                {installing?.running ? t('Instalando…') : t('Instalar motor')}
               </button>
             </div>
             {installing?.running && (
@@ -205,24 +206,24 @@ export function ModelsPage({
         {hardware && (
           <div className="hw-grid">
             <div className="hw-item">
-              <div className="k">Equipo</div>
+              <div className="k">{t('Equipo')}</div>
               <div className="v" title={hardware.cpuModel}>{hardware.cpuModel}</div>
             </div>
             <div className="hw-item">
-              <div className="k">RAM / VRAM</div>
+              <div className="k">{t('RAM / VRAM')}</div>
               <div className="v">
                 {hardware.ramGB} GB · {hardware.unifiedMemory ? 'unificada' : `${hardware.totalVramGB} GB GPU`}
               </div>
             </div>
             <div className="hw-item">
-              <div className="k">Aceleración</div>
+              <div className="k">{t('Aceleración')}</div>
               <div className="v" title={activeBackend === hardware.backend ? 'Detectada en tu equipo' : 'Configurada en Ajustes'}>
                 {activeBackend.toUpperCase()}
                 {backendPref !== 'auto' ? <span className="muted"> · fijada</span> : null}
               </div>
             </div>
             <div className="hw-item">
-              <div className="k">Espacio libre</div>
+              <div className="k">{t('Espacio libre')}</div>
               <div className="v">{hardware.freeDiskGB >= 0 ? `${hardware.freeDiskGB} GB` : '—'}</div>
             </div>
           </div>
@@ -230,7 +231,7 @@ export function ModelsPage({
 
         {(activeDownloads.length > 0 || recentDownloads.length > 0) && (
           <>
-            <div className="section-title">Descargas</div>
+            <div className="section-title">{t('Descargas')}</div>
             {[...activeDownloads, ...recentDownloads].map((job) => {
               const pct = job.sizeBytes > 0 ? Math.min(100, (job.receivedBytes / job.sizeBytes) * 100) : 0
               return (
@@ -242,7 +243,7 @@ export function ModelsPage({
                     </span>
                     {(job.status === 'downloading' || job.status === 'queued') && (
                       <button className="btn btn-sm" onClick={() => void api.models.cancel(job.id)}>
-                        Cancelar
+                        {t('Cancelar')}
                       </button>
                     )}
                   </div>
@@ -265,31 +266,31 @@ export function ModelsPage({
 
         <div className="tabs" style={{ marginTop: 18 }}>
           <button className={`tab ${tab === 'installed' ? 'active' : ''}`} onClick={() => setTab('installed')}>
-            Instalados ({installed.length})
+            {t('Instalados')} ({installed.length})
           </button>
           <button className={`tab ${tab === 'recommended' ? 'active' : ''}`} onClick={() => setTab('recommended')}>
-            Recomendados
+            {t('Recomendados')}
           </button>
           <button className={`tab ${tab === 'search' ? 'active' : ''}`} onClick={() => setTab('search')}>
-            Buscar en HuggingFace
+            {t('Buscar en HuggingFace')}
           </button>
         </div>
 
         {tab === 'installed' && (
           <div>
             <div className="row" style={{ marginBottom: 12 }}>
-              <span className="muted small">Carpeta de modelos: <span className="mono">{modelsDir}</span></span>
+              <span className="muted small">{t('Carpeta de modelos:')} <span className="mono">{modelsDir}</span></span>
               <span className="spacer" />
               <button className="btn btn-sm" onClick={() => void api.shell.openModelsDir()}>
-                Abrir carpeta
+                {t('Abrir carpeta')}
               </button>
               <button className="btn btn-sm" onClick={() => void api.models.importFile().then(() => onRefresh())}>
-                Importar GGUF…
+                {t('Importar GGUF…')}
               </button>
             </div>
             {!installed.length && (
               <div className="empty">
-                No hay modelos instalados. Ve a <strong>Recomendados</strong> para descargar el que mejor encaje con tu
+                No hay modelos instalados. Ve a <strong>{t('Recomendados')}</strong> para descargar el que mejor encaje con tu
                 equipo.
               </div>
             )}
@@ -304,15 +305,15 @@ export function ModelsPage({
                     {model.repo && <span className="mono">{model.repo}</span>}
                   </div>
                 </div>
-                {selectedModelPath === model.path && <span className="badge accent">en uso</span>}
+                {selectedModelPath === model.path && <span className="badge accent">{t('en uso')}</span>}
                 <button className="btn btn-sm" onClick={() => void api.shell.reveal(model.path)}>
-                  Revelar
+                  {t('Revelar')}
                 </button>
                 <button className="btn btn-sm btn-danger" onClick={() => void remove(model)}>
-                  Eliminar
+                  {t('Eliminar')}
                 </button>
                 <button className="btn btn-sm btn-primary" onClick={() => onUseModel(model.path)}>
-                  Usar
+                  {t('Usar')}
                 </button>
               </div>
             ))}
@@ -334,7 +335,7 @@ export function ModelsPage({
                       <span className="reco-name">{rec.model.name}</span>
                       <span className={`badge ${FIT_CLASS[rec.fit]}`}>{FIT_LABEL[rec.fit]}</span>
                       <span className="badge">{rec.quant.quant}</span>
-                      {installedMatch && <span className="badge ok">instalado</span>}
+                      {installedMatch && <span className="badge ok">{t('instalado')}</span>}
                     </div>
                     <div className="reco-desc">{rec.model.description}</div>
                     <div className="model-meta" style={{ marginTop: 8 }}>
@@ -342,8 +343,8 @@ export function ModelsPage({
                       <span>{rec.estimatedSpeed}</span>
                       <span>ctx {rec.model.ctxK}K</span>
                       <span>{rec.model.license}</span>
-                      {rec.model.coding && <span className="badge accent">código</span>}
-                      {rec.model.toolUse && <span className="badge ok">tools</span>}
+                      {rec.model.coding && <span className="badge accent">{t('código')}</span>}
+                      {rec.model.toolUse && <span className="badge ok">{t('tools')}</span>}
                     </div>
                     {!!rec.reasons.length && (
                       <ul className="reco-reasons">
@@ -363,7 +364,7 @@ export function ModelsPage({
                       <span className="spacer" />
                       {installedMatch ? (
                         <button className="btn btn-sm btn-primary" onClick={() => onUseModel(installedMatch.path)}>
-                          Usar modelo
+                          {t('Usar modelo')}
                         </button>
                       ) : (
                         <button
@@ -395,7 +396,7 @@ export function ModelsPage({
                 }}
               />
               <button className="btn btn-primary" onClick={() => void search()} disabled={searching}>
-                {searching ? 'Buscando…' : 'Buscar'}
+                {searching ? t('Buscando…') : t('Buscar')}
               </button>
             </div>
             <p className="muted small">
@@ -410,7 +411,7 @@ export function ModelsPage({
                     <div className="model-meta">
                       <span>{result.downloads.toLocaleString()} descargas</span>
                       <span>{result.likes} likes</span>
-                      {result.gated && <span className="badge warn">gated</span>}
+                      {result.gated && <span className="badge warn">{t('gated')}</span>}
                       {result.tags
                         .filter((t) => /qwen|llama|gemma|coder|deepseek|mistral|gguf/i.test(t))
                         .slice(0, 4)
@@ -419,13 +420,13 @@ export function ModelsPage({
                         ))}
                     </div>
                   </div>
-                  <button className="btn btn-sm">{expanded === result.id ? 'Cerrar' : 'Ver archivos'}</button>
+                  <button className="btn btn-sm">{expanded === result.id ? t('Cerrar') : t('Ver archivos')}</button>
                 </div>
                 {expanded === result.id && (
                   <div style={{ padding: '4px 0 8px 4px' }}>
-                    {!files[result.id] && <div className="muted small">Cargando archivos…</div>}
+                    {!files[result.id] && <div className="muted small">{t('Cargando archivos…')}</div>}
                     {files[result.id]?.filter((f) => !f.isMmproj).length === 0 && (
-                      <div className="muted small">Este repo no tiene GGUF sueltos visibles.</div>
+                      <div className="muted small">{t('Este repo no tiene GGUF sueltos visibles.')}</div>
                     )}
                     {files[result.id]
                       ?.filter((f) => !f.isMmproj && (!f.split || f.split.index === 1))

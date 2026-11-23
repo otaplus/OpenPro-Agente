@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { t } from '../i18n'
 import type { Session } from '@shared/types'
 import { formatDuration, formatInt, formatSpeed } from '../lib'
 
@@ -79,61 +80,61 @@ export function SessionMetrics({
       <button
         className="session-metrics-bar"
         onClick={() => setOpen((v) => !v)}
-        title="Ver el resumen de métricas de esta conversación"
+        title={t('Ver el resumen de métricas de esta conversación')}
       >
         <span className="metric">
-          <strong>{stats.responses}</strong> {stats.responses === 1 ? 'respuesta' : 'respuestas'}
+          <strong>{stats.responses}</strong> {stats.responses === 1 ? t('respuesta') : t('respuestas')}
         </span>
         <span className="metric">
           <strong>{formatInt(stats.completionTokens)}</strong> tok
         </span>
-        <span className="metric">{formatSpeed(stats.genTokPerSec)} media</span>
-        <span className="metric">{formatDuration(stats.totalMs)} en total</span>
-        <span className="session-metrics-toggle">{open ? 'Ocultar' : 'Detalles'}</span>
+        <span className="metric">{formatSpeed(stats.genTokPerSec)} {t('media')}</span>
+        <span className="metric">{formatDuration(stats.totalMs)} {t('en total')}</span>
+        <span className="session-metrics-toggle">{open ? t('Ocultar') : t('Detalles')}</span>
       </button>
 
       {open && (
         <div className="session-metrics-panel">
           <div className="session-metrics-grid">
             <div>
-              <span className="k">Tokens generados</span>
+              <span className="k">{t('Tokens generados')}</span>
               <span className="v">{formatInt(stats.completionTokens)}</span>
             </div>
             <div>
-              <span className="k">Velocidad media</span>
+              <span className="k">{t('Velocidad media')}</span>
               <span className="v">{formatSpeed(stats.genTokPerSec)}</span>
             </div>
             <div>
-              <span className="k">Tokens de prompt</span>
+              <span className="k">{t('Tokens de prompt')}</span>
               <span className="v">{formatInt(stats.promptTokens)}</span>
             </div>
             <div>
-              <span className="k">Prompt por segundo</span>
+              <span className="k">{t('Prompt por segundo')}</span>
               <span className="v">{formatSpeed(stats.promptTokPerSec)}</span>
             </div>
             <div>
-              <span className="k">Primer token (media)</span>
+              <span className="k">{t('Primer token (media)')}</span>
               <span className="v">{formatDuration(stats.firstTokenMs)}</span>
             </div>
             <div>
-              <span className="k">Tiempo acumulado</span>
+              <span className="k">{t('Tiempo acumulado')}</span>
               <span className="v">{formatDuration(stats.totalMs)}</span>
             </div>
             <div>
-              <span className="k">Modelo</span>
+              <span className="k">{t('Modelo')}</span>
               <span className="v mono small">{stats.models.join(', ') || '—'}</span>
             </div>
             <div>
-              <span className="k">Backend</span>
+              <span className="k">{t('Backend')}</span>
               <span className="v">{stats.backend ? stats.backend.toUpperCase() : '—'}</span>
             </div>
           </div>
           <div className="session-metrics-actions">
             <button className="btn btn-sm" disabled={exporting} onClick={() => void exportCsv(false)}>
-              {exporting ? 'Exportando…' : 'Exportar esta conversación (CSV)'}
+              {exporting ? t('Exportando…') : t('Exportar esta conversación (CSV)')}
             </button>
             <button className="btn btn-sm" disabled={exporting} onClick={() => void exportCsv(true)}>
-              Exportar todas (CSV)
+              {t('Exportar todas (CSV)')}
             </button>
           </div>
         </div>

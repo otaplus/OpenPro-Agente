@@ -10,7 +10,7 @@ Agente de programación **100 % local** para tu escritorio. Descarga modelos GGU
 - Aprobación de comandos, permisos por nivel y sesiones persistentes.
 - Métricas por respuesta: tokens, tokens/s, latencia del primer token y tiempo total, para comparar modelos.
 - Resumen por conversación (totales y medias) y exportación a CSV de todas las métricas.
-- UI en español, temas oscuro y claro.
+- UI en español e inglés (las respuestas del motor y de las herramientas siguen en español por ahora), temas oscuro y claro.
 
 > Estado: **beta**. La app funciona en Windows y el código incluye configuración para macOS y Linux; los instaladores de macOS/Linux aún no se han probado a fondo.
 
@@ -101,6 +101,12 @@ Columnas: fecha, conversación, modelo, backend, tokens de prompt (y cuántos en
 | `plan` | Solo lectura y razonamiento: no se ofrecen herramientas de escritura. |
 | `workspace` | Por defecto. Solo opera dentro de la carpeta del proyecto. |
 | `full` | Puede salir del proyecto, pero pide aprobación para escribir o ejecutar fuera. |
+
+### Idioma de la interfaz
+
+En **Ajustes → Idioma** puedes elegir entre **Español** y **English**. El cambio es inmediato y se guarda en `settings.json` (`language: 'es' | 'en'`).
+
+Alcance de esta primera fase: se traduce toda la interfaz (navegación, chat, métricas, modelos, ajustes y asistente inicial), incluidos los números y las fechas (1.234 vs 1,234 y «hace 5 min» vs «5 min ago»). Los mensajes que genera el proceso principal —errores del motor, resultados de herramientas y el prompt del sistema del agente— siguen en español; traducirlos es la fase 2 y requiere volver a probar el tool calling con modelos pequeños.
 
 ### Privacidad
 

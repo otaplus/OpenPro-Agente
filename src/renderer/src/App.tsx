@@ -14,6 +14,7 @@ import type {
   SessionSummary
 } from '@shared/types'
 import { api, shortPath } from './lib'
+import { setLang, t } from './i18n'
 import { Sidebar, type Page } from './components/Sidebar'
 import { ChatView } from './components/ChatView'
 import { ModelsPage } from './components/ModelsPage'
@@ -52,6 +53,7 @@ export default function App() {
   useEffect(() => {
     settingsRef.current = settings
     if (settings) document.documentElement.dataset.theme = settings.theme
+    if (settings) setLang(settings.language)
   }, [settings])
 
   const toast = useCallback((message: string, error = false) => {
@@ -131,7 +133,7 @@ export default function App() {
           if (loaded && sessionIdRef.current === event.sessionId) setSession(loaded)
           setSessions(await api.sessions.list())
         })()
-        if (event.aborted) toast('Generación detenida')
+        if (event.aborted) toast(t('Generación detenida'))
       }),
       api.on.chatApproval((request) => {
         if (request.sessionId !== sessionIdRef.current) return
@@ -166,6 +168,7 @@ export default function App() {
         setInfo(appInfo)
         setSettings(appSettings)
         document.documentElement.dataset.theme = appSettings.theme
+      setLang(appSettings.language)
 
         const [list, models, engineStatus, jobs, installState] = await Promise.all([
           api.sessions.list(),
@@ -201,9 +204,9 @@ export default function App() {
             // Si falla la detección, la pestaña «Recomendados» se queda vacía:
             // mejor decir por qué que dejar una pantalla en blanco.
             toast(
-              `No se pudo leer el hardware del equipo (${
-                err instanceof Error ? err.message : String(err)
-              }). Las recomendaciones no estarán disponibles.`,
+              t('No se pudo leer el hardware del equipo ({error}). Las recomendaciones no estarán disponibles.', {
+                error: err instanceof Error ? err.message : String(err)
+              }),
               true
             )
           })
@@ -219,6 +222,7 @@ export default function App() {
     async (next: AppSettings) => {
       setSettings(next)
       document.documentElement.dataset.theme = next.theme
+      setLang(next.language)
       void refreshInstalled()
     },
     [refreshInstalled]
@@ -262,7 +266,7 @@ export default function App() {
 
   const deleteSession = useCallback(
     async (id: string) => {
-      if (!window.confirm('¿Eliminar esta conversación? No se puede deshacer.')) return
+      if (!window.confirm(t('¿Eliminar esta conversación? No se puede deshacer.'))) return
       await api.sessions.delete(id)
       setSessions(await api.sessions.list())
       if (sessionIdRef.current === id) await newChat()
@@ -278,7 +282,7 @@ export default function App() {
         if (!dir) return
         const next = await api.settings.save({ lastWorkspace: dir })
         await applySettings(next)
-        toast('Carpeta del proyecto actualizada')
+        toast(t('Carpeta del proyecto actualizada'))
       })()
     })
     return () => {
@@ -303,7 +307,7 @@ export default function App() {
         setSession(updated)
       }
     }
-    toast('Carpeta del proyecto actualizada')
+    toast(t('Carpeta del proyecto actualizada'))
   }, [applySettings, toast])
 
   const startModel = useCallback(
@@ -336,12 +340,12 @@ export default function App() {
       const workspace = session.workspace ?? current?.lastWorkspace ?? null
       const modelPath = current?.lastModelPath ?? session.modelPath ?? null
       if (!workspace) {
-        toast('Elige primero una carpeta de proyecto', true)
+        toast(t('Elige primero una carpeta de proyecto'), true)
         setPage('chat')
         return
       }
       if (!modelPath) {
-        toast('Elige un modelo para empezar', true)
+        toast(t('Elige un modelo para empezar'), true)
         setPage('models')
         return
       }
@@ -474,7 +478,7 @@ export default function App() {
             </select>
           ) : (
             <button className="btn" onClick={() => setPage('models')}>
-              Descargar un modelo
+              {t('Descargar un modelo')}
             </button>
           )}
           <div className={`status-chip ${chipClass}`} title={engine?.message ?? ''}>

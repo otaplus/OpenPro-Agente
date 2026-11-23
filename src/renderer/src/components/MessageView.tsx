@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { t } from '../i18n'
 import type { ChatMessage, MessageMetrics } from '@shared/types'
 import { Markdown } from './Markdown'
 import { ToolCard } from './ToolCard'
@@ -10,14 +11,14 @@ function CopyButton({ text }: { text: string }) {
   return (
     <button
       className="copy-btn"
-      title="Copiar respuesta"
+      title={t('Copiar respuesta')}
       onClick={() => {
         void window.clipboard.write(text)
         setCopied(true)
         setTimeout(() => setCopied(false), 1200)
       }}
     >
-      {copied ? '✓ Copiado' : 'Copiar'}
+      {copied ? t('✓ Copiado') : t('Copiar')}
     </button>
   )
 }
@@ -25,16 +26,16 @@ function CopyButton({ text }: { text: string }) {
 /** Pie con los números de la generación, para comparar modelos de un vistazo. */
 function MetricsFooter({ metrics }: { metrics: MessageMetrics }) {
   const detail = [
-    `Modelo: ${metrics.model ?? '—'}${metrics.backend ? ` (${metrics.backend})` : ''}`,
-    `Tokens del prompt: ${formatInt(metrics.promptTokens)}${
-      metrics.cachedTokens ? ` (${formatInt(metrics.cachedTokens)} en caché)` : ''
+    `${t('Modelo')}: ${metrics.model ?? '—'}${metrics.backend ? ` (${metrics.backend})` : ''}`,
+    `${t('Tokens de prompt')}: ${formatInt(metrics.promptTokens)}${
+      metrics.cachedTokens ? ` (${formatInt(metrics.cachedTokens)} ${t('en caché')})` : ''
     }`,
-    `Evaluación del prompt: ${formatDuration(metrics.promptMs)} · ${formatSpeed(metrics.promptTokPerSec)}`,
-    `Tokens generados: ${formatInt(metrics.completionTokens)}`,
-    `Generación: ${formatDuration(metrics.genMs)} · ${formatSpeed(metrics.genTokPerSec)}`,
-    `Primer token: ${formatDuration(metrics.firstTokenMs)}`,
-    `Total: ${formatDuration(metrics.totalMs)}`,
-    metrics.steps && metrics.steps > 1 ? `Pasos del agente: ${metrics.steps}` : ''
+    `${t('Evaluación del prompt')}: ${formatDuration(metrics.promptMs)} · ${formatSpeed(metrics.promptTokPerSec)}`,
+    `${t('Tokens generados')}: ${formatInt(metrics.completionTokens)}`,
+    `${t('Generación')}: ${formatDuration(metrics.genMs)} · ${formatSpeed(metrics.genTokPerSec)}`,
+    `${t('Primer token (media)')}: ${formatDuration(metrics.firstTokenMs)}`,
+    `${t('en total')}: ${formatDuration(metrics.totalMs)}`,
+    metrics.steps && metrics.steps > 1 ? `${t('Pasos del agente')}: ${metrics.steps}` : ''
   ]
     .filter(Boolean)
     .join('\n')
@@ -45,11 +46,11 @@ function MetricsFooter({ metrics }: { metrics: MessageMetrics }) {
         <strong>{formatInt(metrics.completionTokens)}</strong> tok
       </span>
       <span className="metric">{formatSpeed(metrics.genTokPerSec)}</span>
-      <span className="metric">1er tok {formatDuration(metrics.firstTokenMs)}</span>
+      <span className="metric">{t('1er tok')} {formatDuration(metrics.firstTokenMs)}</span>
       <span className="metric">{formatDuration(metrics.totalMs)}</span>
       {metrics.promptTokens > 0 && (
         <span className="metric muted">
-          prompt {formatInt(metrics.promptTokens)} tok · {formatSpeed(metrics.promptTokPerSec)}
+          {t('prompt')} {formatInt(metrics.promptTokens)} tok · {formatSpeed(metrics.promptTokPerSec)}
         </span>
       )}
     </div>
@@ -97,7 +98,7 @@ export function MessageView({
         </div>
         {message.reasoning && (
           <details className="reasoning">
-            <summary>Razonamiento del modelo</summary>
+            <summary>{t('Razonamiento del modelo')}</summary>
             <div className="reasoning-body">{message.reasoning}</div>
           </details>
         )}

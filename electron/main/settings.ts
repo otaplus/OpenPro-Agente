@@ -12,6 +12,7 @@ export function defaultSettings(): AppSettings {
     modelsDir: path.join(os.homedir(), 'OpenProAgente', 'models'),
     onboardingDone: false,
     theme: 'dark',
+    language: 'es',
     hfToken: '',
     engine: {
       mode: 'managed',
@@ -62,6 +63,7 @@ export async function loadSettings(): Promise<AppSettings> {
     // Sanea valores claramente inválidos.
     cache.engine.ctxSize = Math.min(Math.max(cache.engine.ctxSize || 8192, 2048), 262144)
     cache.engine.port = Math.min(Math.max(cache.engine.port || 8790, 1024), 65535)
+  if (cache.language !== 'en') cache.language = 'es'
     if (!cache.modelsDir) cache.modelsDir = defaultSettings().modelsDir
     if (!['plan', 'workspace', 'full'].includes(cache.agent.permission)) cache.agent.permission = 'workspace'
   }
