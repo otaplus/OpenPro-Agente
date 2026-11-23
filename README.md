@@ -8,6 +8,7 @@ Agente de programación **100 % local** para tu escritorio. Descarga modelos GGU
 - Recomendador de modelos según tu RAM, VRAM y espacio libre.
 - Agente con herramientas: leer, escribir y editar archivos, buscar, listar, ejecutar comandos y consultar documentación web.
 - Aprobación de comandos, permisos por nivel y sesiones persistentes.
+- Métricas por respuesta: tokens, tokens/s, latencia del primer token y tiempo total, para comparar modelos.
 - UI en español, temas oscuro y claro.
 
 > Estado: **beta**. La app funciona en Windows y el código incluye configuración para macOS y Linux; los instaladores de macOS/Linux aún no se han probado a fondo.
@@ -68,6 +69,18 @@ Consejo: en equipos de 8 GB, empieza por modelos de 1,5-3B en `Q4_K_M`. En 16 GB
 - **Ajustes**: carpeta de modelos, token de HuggingFace (solo para repos privados/gated), backend, contexto, capas en GPU, hilos, argumentos extra, puerto, permisos del agente, temperatura, tokens máximos, instrucciones extra y allowlist de comandos.
 
 Los lanzamientos largos muestran un contador «Pensando… N s». En CPU un modelo pequeño puede tardar entre segundos y varios minutos por respuesta; es normal.
+
+### Métricas de cada respuesta
+
+Debajo de cada respuesta aparece un pie con los números reales que reporta llama.cpp:
+
+- **tokens generados** y **tokens/s** de generación (la velocidad a la que el modelo escribe).
+- **1er tok**: latencia hasta el primer token, que incluye procesar todo el prompt (lo que más pesa en CPU).
+- **tiempo total** de la llamada.
+- **prompt**: tokens enviados (historial + instrucciones + herramientas) y su velocidad de evaluación.
+
+Pasa el ratón por encima para ver el desglose completo (modelo, backend, tokens en caché y pasos del agente).
+Es la forma más rápida de comparar dos modelos con la misma petición: mismos tokens de prompt, distinta velocidad y calidad.
 
 ### Permisos del agente
 

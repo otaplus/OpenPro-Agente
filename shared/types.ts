@@ -162,6 +162,31 @@ export interface ToolCall {
 
 export type ChatRole = 'system' | 'user' | 'assistant' | 'tool'
 
+/** Métricas de una generación, para comparar modelos con números. */
+export interface MessageMetrics {
+  /** Modelo que generó la respuesta (nombre del archivo GGUF). */
+  model?: string
+  backend?: Backend
+  /** Tokens del prompt: historial + mensajes + esquemas de herramientas. */
+  promptTokens: number
+  /** Tokens generados (razonamiento + respuesta). */
+  completionTokens: number
+  /** Parte del prompt que ya estaba en caché (no se reprocesa). */
+  cachedTokens?: number
+  /** Evaluación del prompt (prefill). */
+  promptMs?: number
+  promptTokPerSec?: number
+  /** Generación de la respuesta. */
+  genMs?: number
+  genTokPerSec?: number
+  /** Tiempo hasta el primer token visible, medido en el cliente. */
+  firstTokenMs?: number
+  /** Duración total de la llamada al motor. */
+  totalMs?: number
+  /** Pasos del agente que se acumulan en este mensaje. */
+  steps?: number
+}
+
 export interface ChatMessage {
   id: string
   role: ChatRole
@@ -173,6 +198,8 @@ export interface ChatMessage {
   createdAt: number
   error?: string
   toolStatus?: 'done' | 'error' | 'denied'
+  /** Métricas de la respuesta (tokens, velocidad, tiempos). */
+  metrics?: MessageMetrics
   meta?: {
     model?: string
     tokens?: number
@@ -281,6 +308,8 @@ export interface ChatDoneEvent {
   reasoning?: string
   steps: number
   durationMs: number
+  /** Totales de la respuesta terminada (para el pie de métricas). */
+  metrics?: MessageMetrics
   aborted?: boolean
   error?: string
 }

@@ -537,6 +537,28 @@ export interface StreamResult {
   toolCalls: ToolCall[]
   finishReason: string | null
   usage?: { prompt_tokens?: number; completion_tokens?: number }
+  /** Datos de rendimiento medidos durante la llamada. */
+  timings?: StreamTimings
+}
+
+/** Tiempos de una llamada al motor: parte del servidor y parte del cliente. */
+export interface StreamTimings {
+  /** Tokens del prompt (todo lo enviado). */
+  promptTokens: number
+  /** Tokens generados (razonamiento + respuesta + tool calls). */
+  completionTokens: number
+  /** Tokens del prompt servidos desde caché. */
+  cachedTokens?: number
+  /** Prefill medido por llama.cpp. */
+  promptMs?: number
+  promptTokPerSec?: number
+  /** Generación medida por llama.cpp. */
+  genMs?: number
+  genTokPerSec?: number
+  /** Tiempo hasta el primer delta visible (cliente). */
+  firstTokenMs?: number
+  /** Duración total de la petición (cliente). */
+  totalMs?: number
 }
 
 interface DeltaToolCall {
@@ -599,6 +621,9 @@ export async function streamChat(opts: {
   let reasoning = ''
   let finishReason: string | null = null
   let usage: StreamResult['usage']
+  let serverTimings: { prompt_n?: number; prompt_ms?: number; prompt_per_second?: number; predicted_n?: number; predicted_ms?: number; predicted_per_second?: number; cache_n?: number } | undefined
+  const startedAt = Date.now()
+  let firstTokenAt = 0
   const toolAcc = new Map<number, DeltaToolCall>()
 
   const { Readable } = await import('node:stream')
@@ -618,15 +643,18 @@ export async function streamChat(opts: {
       const choice = json.choices?.[0]
       const delta = choice?.delta ?? {}
       if (typeof delta.content === 'string' && delta.content) {
+        if (!firstTokenAt) firstTokenAt = Date.now()
         content += delta.content
         opts.onContent?.(delta.content)
       }
       const thought = delta.reasoning_content ?? delta.reasoning
       if (typeof thought === 'string' && thought) {
+        if (!firstTokenAt) firstTokenAt = Date.now()
         reasoning += thought
         opts.onReasoning?.(thought)
       }
       if (Array.isArray(delta.tool_calls)) {
+        if (!firstTokenAt) firstTokenAt = Date.now()
         for (const tc of delta.tool_calls as DeltaToolCall[]) {
           const index = typeof tc.index === 'number' ? tc.index : toolAcc.size
           const prev = toolAcc.get(index) ?? { index }
@@ -643,6 +671,8 @@ export async function streamChat(opts: {
       }
       if (choice?.finish_reason) finishReason = choice.finish_reason
       if (json.usage) usage = json.usage
+      // El último chunk de llama-server trae los tiempos exactos del servidor.
+      if (json.timings) serverTimings = json.timings
     }
   }
 
@@ -666,12 +696,42 @@ export async function streamChat(opts: {
       args: parseArgs(tc.function?.arguments ?? '')
     }))
 
-  return { content, reasoning, toolCalls, finishReason, usage }
+  // Métricas: se prefieren los tiempos que reporta llama.cpp; si no llegan,
+  // se usa lo medido en el cliente para no quedarnos sin números.
+  const totalMs = Date.now() - startedAt
+  const completionTokens = serverTimings?.predicted_n ?? usage?.completion_tokens ?? 0
+  const promptTokens = serverTimings?.prompt_n ?? usage?.prompt_tokens ?? 0
+  const timings: StreamTimings = {
+    promptTokens,
+    completionTokens,
+    cachedTokens: serverTimings?.cache_n,
+    promptMs: serverTimings?.prompt_ms,
+    promptTokPerSec: serverTimings?.prompt_per_second,
+    genMs: serverTimings?.predicted_ms,
+    genTokPerSec:
+      serverTimings?.predicted_per_second ??
+      (completionTokens > 0 && serverTimings?.predicted_ms
+        ? (completionTokens * 1000) / serverTimings.predicted_ms
+        : undefined),
+    firstTokenMs: firstTokenAt ? firstTokenAt - startedAt : undefined,
+    totalMs
+  }
+
+  return { content, reasoning, toolCalls, finishReason, usage, timings }
 }
 
 function safeParse(text: string): {
   choices?: Array<{ delta?: Record<string, unknown>; finish_reason?: string | null }>
   usage?: { prompt_tokens?: number; completion_tokens?: number }
+  timings?: {
+    prompt_n?: number
+    prompt_ms?: number
+    prompt_per_second?: number
+    predicted_n?: number
+    predicted_ms?: number
+    predicted_per_second?: number
+    cache_n?: number
+  }
 } | null {
   try {
     return JSON.parse(text)

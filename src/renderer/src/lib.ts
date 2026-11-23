@@ -30,6 +30,29 @@ export function shortPath(p: string | null | undefined): string {
   return parts.length <= 3 ? p : `…/${parts.slice(-2).join('/')}`
 }
 
+/** Números con separador de miles en español (1.234). */
+export function formatInt(n: number | undefined): string {
+  if (n === undefined || !Number.isFinite(n)) return '—'
+  return Math.round(n).toLocaleString('es-ES')
+}
+
+/** Velocidad en tokens por segundo con un decimal (58,7 tok/s). */
+export function formatSpeed(n: number | undefined): string {
+  if (n === undefined || !Number.isFinite(n)) return '—'
+  return `${n.toFixed(1).replace('.', ',')} tok/s`
+}
+
+/** Duración legible: 640 ms, 4,2 s, 2 min 5 s. */
+export function formatDuration(ms: number | undefined): string {
+  if (ms === undefined || !Number.isFinite(ms)) return '—'
+  if (ms < 1000) return `${Math.round(ms)} ms`
+  const seconds = ms / 1000
+  if (seconds < 60) return `${seconds.toFixed(1).replace('.', ',')} s`
+  const min = Math.floor(seconds / 60)
+  const rest = Math.round(seconds % 60)
+  return `${min} min ${rest} s`
+}
+
 export async function copyText(text: string): Promise<void> {
   try {
     await navigator.clipboard.writeText(text)

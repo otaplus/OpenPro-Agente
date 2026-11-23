@@ -3,14 +3,16 @@ import path from 'node:path'
 import type {
   ApprovalDecision,
   ApprovalRequest,
+  Backend,
   ChatMessage,
   ChatSendPayload,
+  MessageMetrics,
   ModelSampling,
   Session,
   ToolCall
 } from '@shared/types'
 import { emit } from './bus'
-import { engineStatus, startEngine, streamChat, type EngineMessage } from './engine'
+import { engineStatus, startEngine, streamChat, type EngineMessage, type StreamResult } from './engine'
 import { executeTool, isOutsideWorkspace, toolDefinitions, TOOLS, WRITE_TOOLS } from './tools'
 import { loadSession, saveSession } from './sessions'
 import { loadSettings, saveSettings } from './settings'
@@ -49,6 +51,34 @@ export function isRunning(sessionId: string): boolean {
 }
 
 // ------------------------------ Utilidades -------------------------------
+
+/**
+ * Convierte los tiempos del motor en las métricas que se guardan en el mensaje.
+ * Son las que el usuario usa para comparar modelos (tokens, tok/s, latencia).
+ */
+function metricsFor(
+  result: StreamResult,
+  modelPath: string,
+  steps: number,
+  backend?: Backend
+): MessageMetrics | undefined {
+  const t = result.timings
+  if (!t) return undefined
+  return {
+    model: path.basename(modelPath),
+    backend,
+    promptTokens: t.promptTokens,
+    completionTokens: t.completionTokens,
+    cachedTokens: t.cachedTokens,
+    promptMs: t.promptMs,
+    promptTokPerSec: t.promptTokPerSec,
+    genMs: t.genMs,
+    genTokPerSec: t.genTokPerSec,
+    firstTokenMs: t.firstTokenMs,
+    totalMs: t.totalMs,
+    steps
+  }
+}
 
 function batched(sessionId: string, messageId: string): {
   content: (t: string) => void
@@ -575,12 +605,14 @@ async function runChat(payload: ChatSendPayload, controller: AbortController): P
       }
       lastContent = content
 
+      const metrics = metricsFor(result, modelPath, step, engineStatus().backend ?? undefined)
       const assistantMessage: ChatMessage = {
         id: assistantId,
         role: 'assistant',
         content,
         reasoning: result.reasoning || undefined,
         toolCalls: calls.length ? calls : undefined,
+        metrics,
         createdAt: Date.now()
       }
       session.messages.push(assistantMessage)
@@ -593,7 +625,8 @@ async function runChat(payload: ChatSendPayload, controller: AbortController): P
           content,
           reasoning: result.reasoning || undefined,
           steps: totalSteps,
-          durationMs: Date.now() - started
+          durationMs: Date.now() - started,
+          metrics
         })
         return
       }
@@ -725,6 +758,7 @@ async function runChat(payload: ChatSendPayload, controller: AbortController): P
         // herramientas para que resuma lo que ya hizo: el trabajo suele estar hecho.
         const closingId = uid('msg_')
         let closing = ''
+        let closingMetrics: MessageMetrics | undefined
         try {
           const sender = batched(sessionId, closingId)
           const summary = await streamChat({
@@ -748,6 +782,7 @@ async function runChat(payload: ChatSendPayload, controller: AbortController): P
           })
           sender.stop()
           closing = summary.content.trim()
+          closingMetrics = metricsFor(summary, modelPath, totalSteps, engineStatus().backend ?? undefined)
         } catch {
           // si el resumen falla, queda el aviso de abajo
         }
@@ -758,6 +793,7 @@ async function runChat(payload: ChatSendPayload, controller: AbortController): P
           id: closingId,
           role: 'assistant',
           content,
+          metrics: closingMetrics,
           createdAt: Date.now()
         }
         session.messages.push(loopMessage)
@@ -767,7 +803,8 @@ async function runChat(payload: ChatSendPayload, controller: AbortController): P
           messageId: loopMessage.id,
           content,
           steps: totalSteps,
-          durationMs: Date.now() - started
+          durationMs: Date.now() - started,
+          metrics: closingMetrics
         })
         return
       }

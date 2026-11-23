@@ -596,6 +596,34 @@ a {
   white-space: pre-wrap;
 }
 
+/* Pie de métricas: tokens, velocidad y tiempos de la última respuesta. */
+.msg-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  margin-top: 8px;
+  padding-top: 7px;
+  border-top: 1px dashed var(--border);
+  font-size: 11px;
+  color: var(--muted);
+  cursor: help;
+  user-select: none;
+}
+
+.msg-metrics .metric {
+  white-space: nowrap;
+}
+
+.msg-metrics .metric strong {
+  color: var(--text-dim);
+  font-weight: 600;
+}
+
+.msg-metrics .metric.muted {
+  opacity: 0.75;
+}
+
 .cursor {
   display: inline-block;
   width: 7px;

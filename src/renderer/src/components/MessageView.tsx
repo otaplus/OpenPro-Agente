@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import type { ChatMessage } from '@shared/types'
+import type { ChatMessage, MessageMetrics } from '@shared/types'
 import { Markdown } from './Markdown'
 import { ToolCard } from './ToolCard'
+import { formatDuration, formatInt, formatSpeed } from '../lib'
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false)
@@ -18,6 +19,40 @@ function CopyButton({ text }: { text: string }) {
     >
       {copied ? '✓ Copiado' : 'Copiar'}
     </button>
+  )
+}
+
+/** Pie con los números de la generación, para comparar modelos de un vistazo. */
+function MetricsFooter({ metrics }: { metrics: MessageMetrics }) {
+  const detail = [
+    `Modelo: ${metrics.model ?? '—'}${metrics.backend ? ` (${metrics.backend})` : ''}`,
+    `Tokens del prompt: ${formatInt(metrics.promptTokens)}${
+      metrics.cachedTokens ? ` (${formatInt(metrics.cachedTokens)} en caché)` : ''
+    }`,
+    `Evaluación del prompt: ${formatDuration(metrics.promptMs)} · ${formatSpeed(metrics.promptTokPerSec)}`,
+    `Tokens generados: ${formatInt(metrics.completionTokens)}`,
+    `Generación: ${formatDuration(metrics.genMs)} · ${formatSpeed(metrics.genTokPerSec)}`,
+    `Primer token: ${formatDuration(metrics.firstTokenMs)}`,
+    `Total: ${formatDuration(metrics.totalMs)}`,
+    metrics.steps && metrics.steps > 1 ? `Pasos del agente: ${metrics.steps}` : ''
+  ]
+    .filter(Boolean)
+    .join('\n')
+
+  return (
+    <div className="msg-metrics" title={detail}>
+      <span className="metric">
+        <strong>{formatInt(metrics.completionTokens)}</strong> tok
+      </span>
+      <span className="metric">{formatSpeed(metrics.genTokPerSec)}</span>
+      <span className="metric">1er tok {formatDuration(metrics.firstTokenMs)}</span>
+      <span className="metric">{formatDuration(metrics.totalMs)}</span>
+      {metrics.promptTokens > 0 && (
+        <span className="metric muted">
+          prompt {formatInt(metrics.promptTokens)} tok · {formatSpeed(metrics.promptTokPerSec)}
+        </span>
+      )}
+    </div>
   )
 }
 
@@ -48,13 +83,15 @@ export function MessageView({
     )
   }
 
+  const modelName = message.metrics?.model ?? message.meta?.model
+
   return (
     <div className="msg">
       <div className="avatar assistant">OP</div>
       <div className="msg-body">
         <div className="msg-head">
           <span className="name">OpenPro</span>
-          {message.meta?.model && <span>{message.meta.model}</span>}
+          {modelName && <span>{modelName}</span>}
           <span className="spacer" />
           <CopyButton text={message.content} />
         </div>
@@ -78,6 +115,7 @@ export function MessageView({
             />
           )
         })}
+        {message.metrics && <MetricsFooter metrics={message.metrics} />}
       </div>
     </div>
   )
