@@ -1,0 +1,43 @@
+appId: com.openpro.agente
+productName: OpenPro Agente
+copyright: Copyright © 2026 OpenPro
+directories:
+  output: release
+  buildResources: build
+files:
+  - out/**/*
+  - package.json
+asar: true
+win:
+  icon: build/icon.ico
+  target:
+    - target: nsis
+      arch: [x64]
+    - target: portable
+      arch: [x64]
+nsis:
+  artifactName: OpenPro-Agente-Instalador-${version}.${ext}
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  installerIcon: build/icon.ico
+  uninstallerIcon: build/icon.ico
+portable:
+  artifactName: OpenPro-Agente-Portable-${version}.${ext}
+mac:
+  icon: build/icon.png
+  target:
+    - target: dmg
+      arch: [arm64, x64]
+  category: public.app-category.developer-tools
+  artifactName: ${productName}-${version}-${arch}.${ext}
+linux:
+  icon: build/icon.png
+  target:
+    - AppImage
+    - deb
+  category: Development
+  maintainer: OpenPro
+  artifactName: ${productName}-${version}-${arch}.${ext}

@@ -1,0 +1,12 @@
+node_modules/
+out/
+release/
+dist/
+*.log
+.DS_Store
+Thumbs.db
+.env
+# Perfil y binarios usados en las pruebas manuales de QA
+.tmp-qa/
+# Notas internas de traspaso (rutas locales, pruebas)
+HANDOFF.md

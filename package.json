@@ -1,0 +1,38 @@
+{
+  "name": "openpro-agente",
+  "version": "0.1.0",
+  "description": "Agente de programación local con modelos GGUF de HuggingFace y motor llama.cpp embebido",
+  "main": "./out/main/index.js",
+  "author": "OpenPro",
+  "license": "Apache-2.0",
+  "private": true,
+  "scripts": {
+    "postinstall": "node scripts/patch-builder.js",
+    "dev": "electron-vite dev",
+    "start": "electron-vite preview",
+    "build": "electron-vite build",
+    "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json",
+    "dist": "npm run build && electron-builder",
+    "dist:win": "npm run build && electron-builder --win",
+    "dist:mac": "npm run build && electron-builder --mac",
+    "dist:linux": "npm run build && electron-builder --linux"
+  },
+  "dependencies": {
+    "dompurify": "^3.4.18",
+    "marked": "^18.2.1",
+    "systeminformation": "^5.33.23"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^6.3.0",
+    "electron": "^45.4.1",
+    "electron-builder": "^26.18.0",
+    "electron-vite": "^6.0.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "typescript": "~5.9.0",
+    "vite": "^8.3.8"
+  }
+}
